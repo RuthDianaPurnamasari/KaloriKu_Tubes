@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaloriku/view/screen/bottom_navbar.dart';
 import 'package:kaloriku/services/auth_manager.dart';
 import 'package:kaloriku/view/screen/home_page.dart';
 import 'package:kaloriku/view/screen/login_page.dart';
@@ -45,7 +46,7 @@ class _MainAppState extends State<MainApp> {
       debugShowCheckedModeBanner: false,
       title: 'KaloriKu',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: isAuthenticated ? const HomePage() : const LoginPage(),
+      home: isAuthenticated ? const DynamicBottomNavbar() : const LoginPage(),
     );
   }
 }

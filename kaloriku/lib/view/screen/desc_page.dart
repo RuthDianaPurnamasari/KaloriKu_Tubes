@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:kaloriku/services/auth_manager.dart';
-import 'package:kaloriku/view/screen/desc_page.dart';
-import 'package:kaloriku/view/screen/menu_page.dart';
-import 'package:kaloriku/view/screen/profile_page.dart';
-import 'package:kaloriku/view/screen/bottom_navbar.dart';
-import 'login_page.dart';
+import 'package:kaloriku/view/screen/login_page.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class DescPage extends StatelessWidget {
+  const DescPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('KaloriKu'),
+        title: const Text('About'),
         actions: [
           IconButton(
             onPressed: () {
@@ -26,39 +22,38 @@ class HomePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Hero Section
+            // Gambar Header
             Stack(
               children: [
                 Container(
                   width: double.infinity,
-                  height: 250,
+                  height: 200,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage("assets/images/healthy_food.jpeg"),
+                      image: AssetImage("assets/images/restaurant.jpeg"),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 Container(
                   width: double.infinity,
-                  height: 250,
-                  color: Colors.black.withOpacity(0.4),
+                  height: 200,
+                  color: Colors.black.withOpacity(0.3),
                   alignment: Alignment.center,
                   child: const Text(
-                    "Hidup Sehat dengan KaloriKu",
+                    "Aplikasi KaloriKu",
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
 
-            // Tentang KaloriKu
+            // Deskripsi Aplikasi
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Card(
@@ -72,7 +67,7 @@ class HomePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Apa Itu KaloriKu?",
+                        "Tentang Aplikasi",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -81,7 +76,7 @@ class HomePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        "KaloriKu adalah aplikasi catering sehat yang dirancang untuk membantu pengguna dalam memilih makanan sehat, menghitung kalori, dan mendapatkan rekomendasi menu sesuai dengan kebutuhan gizi mereka. Dengan fitur unggulan, KaloriKu menawarkan solusi praktis untuk hidup lebih sehat dan teratur.",
+                        "KaloriKu adalah aplikasi catering sehat yang membantu pengguna dalam memilih menu makanan sehat, menghitung kalori, dan mendapatkan informasi gizi yang sesuai dengan kebutuhan mereka. Dengan fitur-fitur unggulan, KaloriKu bertujuan untuk memberikan solusi makan sehat dengan mudah dan praktis.",
                         style: TextStyle(fontSize: 16),
                         textAlign: TextAlign.justify,
                       ),
@@ -91,22 +86,28 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            // Fitur Utama
+            // Fitur-Fitur Aplikasi
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   _buildFeatureCard(
                     icon: Icons.fastfood,
-                    title: "Menu Sehat",
+                    title: "Pilih Menu Sehat",
                     description:
-                        "Beragam pilihan makanan sehat yang disesuaikan dengan kebutuhan nutrisi Anda.",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const MenuPage()),
-                      );
-                    },
+                        "Temukan berbagai pilihan menu sehat yang sesuai dengan kebutuhan diet Anda.",
+                  ),
+                  _buildFeatureCard(
+                    icon: Icons.calculate,
+                    title: "Hitung Kalori",
+                    description:
+                        "Lacak asupan kalori harian Anda dan pastikan sesuai dengan target kesehatan.",
+                  ),
+                  _buildFeatureCard(
+                    icon: Icons.article,
+                    title: "Artikel Kesehatan",
+                    description:
+                        "Dapatkan tips dan informasi terbaru seputar pola makan sehat dan gaya hidup sehat.",
                   ),
                 ],
               ),
@@ -121,46 +122,43 @@ class HomePage extends StatelessWidget {
   Widget _buildFeatureCard(
       {required IconData icon,
       required String title,
-      required String description,
-      required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 3,
-        margin: const EdgeInsets.only(bottom: 12),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Icon(icon, size: 40, color: Colors.deepPurple),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+      required String description}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Icon(icon, size: 40, color: Colors.deepPurple),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      description,
-                      style: const TextStyle(fontSize: 14, color: Colors.black54),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    description,
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
 // LOGOUT
 void _showLogoutConfirmationDialog(BuildContext context) {
   showDialog(

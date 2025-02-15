@@ -31,7 +31,7 @@ class FoodCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // if (food.insertedId != null) _buildDataRow('ID', food.insertedId),
-             _buildDataRow('Nama', food.name),
+              _buildDataRow('Nama', food.name),
               _buildDataRow('Bahan', food.ingredients),
               _buildDataRow('Deskripsi', food.description),
               _buildDataRow('Kalori', '${food.calories} kcal'),

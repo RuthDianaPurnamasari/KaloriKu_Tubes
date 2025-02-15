@@ -32,12 +32,23 @@ class LoginResponse {
     required this.phone,
   });
 
+ // Factory method untuk convert dari JSON ke object LoginResponse
   factory LoginResponse.fromJson(Map<String, dynamic> json) => LoginResponse(
-        token: json["token"],
-        message: json["message"],
-        status: json["status"],
-        role: json["role"],
-        fullname: json["fullname"],
-        phone: json["phone"],
+        token: json["token"] ?? '',
+        message: json["message"] ?? '',
+        status: json["status"] ?? 0,
+        role: json["role"] ?? '',
+        fullname: json["fullname"] ?? '',
+        phone: json["phone"] ?? '',
       );
+
+  /// Convert LoginResponse object ke JSON (misal untuk simpan ke local storage)
+  Map<String, dynamic> toJson() => {
+        "token": token,
+        "message": message,
+        "status": status,
+        "role": role,
+        "fullname": fullname,
+        "phone": phone,
+      };
 }

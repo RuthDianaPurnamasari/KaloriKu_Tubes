@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaloriku/model/login_model.dart';
+import 'package:kaloriku/services/api_services.dart';
 import 'package:kaloriku/services/auth_manager.dart';
 import 'package:kaloriku/view/screen/home_page.dart';
 
@@ -83,8 +84,8 @@ class _LoginPageState extends State<LoginPage> {
     try {
       LoginResponse? res = await _dataService.login(loginData);
 
-      if (res.status == 200) {
-        await AuthManager.login(_usernameController.text, res.token!);
+      if (res?.status == 200) {
+        await AuthManager.login(_usernameController.text, res?.token ?? '');
         if (mounted) {
           Navigator.pushAndRemoveUntil(
             context,
@@ -93,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
           );
         }
       } else {
-        displaySnackbar(res.message);
+        displaySnackbar(res?.message ?? 'Unknown error');
       }
     } catch (e) {
       displaySnackbar('Terjadi kesalahan: $e');

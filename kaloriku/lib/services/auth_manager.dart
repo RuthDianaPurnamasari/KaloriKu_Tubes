@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'dart:convert';
 
 class AuthManager {
   static const String loginStatusKey = 'loginStatusKey';
@@ -11,27 +13,22 @@ class AuthManager {
   static Future<bool> isLoggedIn() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool(loginStatusKey) ?? false;
-    String? loginTimeString = prefs.getString(loginTimeKey);
 
-    if (isLoggedIn && loginTimeString != null) {
-      try {
-        DateTime loginTime = DateTime.parse(loginTimeString);
-        final Duration timeDifference = DateTime.now().difference(loginTime);
-
-        // Durasi maksimum untuk validasi login
-        const Duration maxDuration = Duration(hours: 4);
-        if (timeDifference > maxDuration) {
-          await logout();
-          return false;
-        }
-        return true;
-      } catch (e) {
-        debugPrint('Error parsing DateTime: $e');
-        await logout();
-        return false;
-      }
+    if (!isLoggedIn) return false;
+    if (!await isTokenValid()) {
+      await logout();
+      return false;
     }
-    return false;
+
+    return true;
+  }
+
+  /// Memeriksa apakah token masih valid.
+  static Future<bool> isTokenValid() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString(tokenKey);
+    if (token == null) return false;
+    return !JwtDecoder.isExpired(token);
   }
 
   /// Login pengguna dan menyimpan status login.
@@ -40,7 +37,7 @@ class AuthManager {
     await prefs.setBool(loginStatusKey, true);
     await prefs.setString(loginTimeKey, DateTime.now().toString());
     await prefs.setString(usernameKey, username);
-    await prefs.setString('token', token);
+    await prefs.setString(tokenKey, token);
   }
 
   /// Mengambil token pengguna yang sedang login.
@@ -49,12 +46,24 @@ class AuthManager {
     return prefs.getString(tokenKey);
   }
 
+  /// Mengambil username pengguna yang sedang login.
+  static Future<String?> getUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(usernameKey);
+  }
+
   /// Logout pengguna dan menghapus data terkait login.
   static Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove(loginStatusKey);
-    prefs.remove(loginTimeKey);
-    prefs.remove(usernameKey);
-    prefs.remove('token');
+    await prefs.remove(loginStatusKey);
+    await prefs.remove(loginTimeKey);
+    await prefs.remove(usernameKey);
+    await prefs.remove(tokenKey);
+  }
+
+  /// Menghapus semua data di SharedPreferences.
+  static Future<void> clearAllData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 }
