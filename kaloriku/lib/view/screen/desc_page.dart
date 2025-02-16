@@ -14,6 +14,7 @@ class DescPage extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: const Text('About'),
+            backgroundColor: Color.fromARGB(255, 123, 173, 230),
             actions: [
               IconButton(
                 onPressed: () {
@@ -33,7 +34,7 @@ class DescPage extends StatelessWidget {
                       height: 200,
                       decoration: const BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage("assets/images/restaurant.jpeg"),
+                          image: AssetImage("assets/images/KaloriKu.png"),
                           fit: BoxFit.cover,
                         ),
                       ),

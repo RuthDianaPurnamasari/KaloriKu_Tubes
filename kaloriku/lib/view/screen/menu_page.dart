@@ -63,7 +63,8 @@ class _MenuPageState extends State<MenuPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('KaloriKu - Home'),
+        title: const Text('KaloriKu - Management Menu'),
+        backgroundColor: Color.fromARGB(255, 123, 173, 230),
         actions: [
           IconButton(
             onPressed: () {
