@@ -142,19 +142,19 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Widget foodForm() {
-    return Column(
-      children: [
-        textField(_nameCtl, 'Nama Makanan'),
-        textField(_ingredientsCtl, 'Bahan-bahan'),
-        textField(_descriptionCtl, 'Deskripsi'),
-        textField(_caloriesCtl, 'Kalori', isNumber: true),
-        textField(_categoryCtl, 'Kategori'),
-      ],
-    );
-  }
+  return Column(
+    children: [
+      textField(_nameCtl, 'Nama Makanan', validator: _validateName),
+      textField(_ingredientsCtl, 'Bahan-bahan', validator: _validateIngredients),
+      textField(_descriptionCtl, 'Deskripsi', validator: _validateDescription),
+      textField(_caloriesCtl, 'Kalori', isNumber: true, validator: _validateCalories),
+      textField(_categoryCtl, 'Kategori', validator: _validateCategory),
+    ],
+  );
+}
 
   Widget textField(TextEditingController controller, String label,
-      {bool isNumber = false}) {
+      {bool isNumber = false, String? Function(String?)? validator}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: TextFormField(
@@ -168,6 +168,7 @@ class _MenuPageState extends State<MenuPage> {
             icon: const Icon(Icons.clear),
           ),
         ),
+        validator: validator,
       ),
     );
   }
@@ -249,14 +250,12 @@ Widget foodResponseCard() {
       : const SizedBox.shrink();
 }
 
-
   Widget foodListView() {
     return ListView.builder(
       itemCount: _foodList.length,
       itemBuilder: (context, index) {
         final food = _foodList[index];
-        debugPrint(
-            '📝 Makanan ${index + 1}: ${food.name} - ${food.calories} kcal');
+        debugPrint('📝 Makanan ${index + 1}: ${food.name} - ${food.calories} kcal');
         return ListTile(
           title: Text(food.name),
           subtitle: Text('${food.category} - ${food.calories} kcal'),
@@ -265,27 +264,77 @@ Widget foodResponseCard() {
             children: [
               IconButton(
                 onPressed: () {
-                  setState(() {
-                    _nameCtl.text = food.name;
-                    _ingredientsCtl.text = food.ingredients;
-                    _descriptionCtl.text = food.description;
-                    _caloriesCtl.text = food.calories.toString();
-                    _categoryCtl.text = food.category;
-                    isEdit = true;
-                    foodId = food.id;
-                  });
+                  _showEditConfirmationDialog(context, food);
                 },
                 icon: const Icon(Icons.edit),
               ),
               IconButton(
                 onPressed: () {
-                  _dataService.deleteFood(food.id);
-                  refreshFoodList();
+                  _showDeleteConfirmationDialog(context, food.id);
                 },
                 icon: const Icon(Icons.delete),
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showEditConfirmationDialog(BuildContext context, FoodsModel food) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Edit'),
+          content: const Text('Anda yakin ingin mengedit data ini?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Tidak'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                setState(() {
+                  _nameCtl.text = food.name;
+                  _ingredientsCtl.text = food.ingredients;
+                  _descriptionCtl.text = food.description;
+                  _caloriesCtl.text = food.calories.toString();
+                  _categoryCtl.text = food.category;
+                  isEdit = true;
+                  foodId = food.id;
+                });
+              },
+              child: const Text('Ya'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, String foodId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: const Text('Anda yakin ingin menghapus data ini?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Tidak'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                _dataService.deleteFood(foodId);
+                refreshFoodList();
+              },
+              child: const Text('Ya'),
+            ),
+          ],
         );
       },
     );
@@ -368,18 +417,41 @@ Widget foodResponseCard() {
     return null;
   }
 
-  // ignore: unused_element
   String? _validateName(String? value) {
-    if (value == null || value.length < 4) {
+    if (value == null || value.isEmpty) {
+      return 'Nama Makanan tidak boleh kosong';
+    } else if (value.length < 4) {
       return 'Masukkan minimal 4 karakter';
     }
     return null;
   }
 
-// ignore: unused_element
-  String? _validatePhoneNumber(String? value) {
-    if (value == null || !RegExp(r'^[0-9]+$').hasMatch(value)) {
-      return 'Nomor HP harus berisi angka';
+  String? _validateIngredients(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Bahan-bahan tidak boleh kosong';
+    }
+    return null;
+  }
+
+  String? _validateDescription(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Deskripsi tidak boleh kosong';
+    }
+    return null;
+  }
+
+  String? _validateCalories(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Kalori tidak boleh kosong';
+    } else if (double.tryParse(value) == null) {
+      return 'Kalori harus berupa angka';
+    }
+    return null;
+  }
+
+  String? _validateCategory(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Kategori tidak boleh kosong';
     }
     return null;
   }
