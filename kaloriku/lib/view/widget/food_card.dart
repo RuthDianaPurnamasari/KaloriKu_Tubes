@@ -4,14 +4,20 @@ import 'package:kaloriku/model/food_model.dart';
 class FoodCard extends StatelessWidget {
   final FoodsModel foodRes;
   final Function() onDismissed;
+  final FoodResponse response; // Tambahkan response agar bisa digunakan
 
-  const FoodCard({Key? key, required this.foodRes, required this.onDismissed, required FoodResponse response}) : super(key: key);
+  const FoodCard({
+    Key? key,
+    required this.foodRes,
+    required this.onDismissed,
+    required this.response, // Gunakan response di sini
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: Key(foodRes.id),
-      onDismissed: (direction){
+      onDismissed: (direction) {
         onDismissed();
       },
       background: Container(
@@ -30,12 +36,16 @@ class FoodCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // if (food.insertedId != null) _buildDataRow('ID', food.insertedId),
-              _buildDataRow('Nama', foodRes.name),
-              _buildDataRow('Bahan', foodRes.ingredients),
-              _buildDataRow('Deskripsi', foodRes.description),
-              _buildDataRow('Kalori', '${foodRes.calories} kcal'),
-              _buildDataRow('Kategori', foodRes.category),
+            _buildDataRow('Nama', foodRes.name),
+            _buildDataRow('Bahan', foodRes.ingredients),
+            _buildDataRow('Deskripsi', foodRes.description),
+            _buildDataRow('Kalori', '${foodRes.calories} kcal'),
+            _buildDataRow('Kategori', foodRes.category),
+            const SizedBox(height: 10),
+            Text(
+              'Response: ${response.message}', // Menampilkan response message
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
@@ -55,7 +65,7 @@ class FoodCard extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 10), // Jarak antara label dan titik dua
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
             ': $value',

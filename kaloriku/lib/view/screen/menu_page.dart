@@ -3,7 +3,7 @@ import 'package:kaloriku/model/food_model.dart';
 import 'package:kaloriku/services/api_services.dart';
 import 'package:kaloriku/services/auth_manager.dart';
 import 'package:kaloriku/view/screen/login_page.dart';
-import 'package:kaloriku/view/widget/food_card.dart'; 
+import 'package:kaloriku/view/widget/food_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 
@@ -31,21 +31,23 @@ class _MenuPageState extends State<MenuPage> {
   String token = '';
   String username = '';
   final Dio dio = Dio();
-  final String _baseUrl = 'https://ws-kaloriku-4cf736febaf0.herokuapp.com'; // Replace with your actual base URL
+  final String _baseUrl =
+      'https://ws-kaloriku-4cf736febaf0.herokuapp.com'; // Replace with your actual base URL
 
   @override
-    void initState() {
-      super.initState();
-      inital();
-      refreshFoodList();
-    }
-    void inital() async {
-      loginData = await SharedPreferences.getInstance();
-      setState(() {
-        username = loginData.getString('username').toString();
-        token = loginData.getString('token').toString();
-      });
-    }
+  void initState() {
+    super.initState();
+    inital();
+    refreshFoodList();
+  }
+
+  void inital() async {
+    loginData = await SharedPreferences.getInstance();
+    setState(() {
+      username = loginData.getString('username').toString();
+      token = loginData.getString('token').toString();
+    });
+  }
 
   @override
   void dispose() {
@@ -79,7 +81,7 @@ class _MenuPageState extends State<MenuPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             Card(),
+              Card(),
               const SizedBox(height: 20.0),
               foodForm(),
               actionButtons(),
@@ -151,7 +153,8 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  Widget textField(TextEditingController controller, String label, {bool isNumber = false}) {
+  Widget textField(TextEditingController controller, String label,
+      {bool isNumber = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: TextFormField(
@@ -177,15 +180,16 @@ class _MenuPageState extends State<MenuPage> {
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
               final foodInput = FoodInput(
-              name: _nameCtl.text,
-              ingredients: _ingredientsCtl.text,
-              description: _descriptionCtl.text,
-              calories: double.tryParse(_caloriesCtl.text.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0, // ✅ Pastikan hanya angka
-              category: _categoryCtl.text,
-            );
+                name: _nameCtl.text,
+                ingredients: _ingredientsCtl.text,
+                description: _descriptionCtl.text,
+                calories: double.tryParse(
+                        _caloriesCtl.text.replaceAll(RegExp(r'[^0-9.]'), '')) ??
+                    0, // ✅ Pastikan hanya angka
+                category: _categoryCtl.text,
+              );
 
               debugPrint('🔍 Mengirim data: ${foodInput.calories} gram');
-
 
               FoodResponse? res;
               if (isEdit) {
@@ -219,25 +223,40 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  Widget foodResponseCard() {
-    return foodResponse != null
-        ? FoodCard(
-            response: foodResponse!,
-            onDismissed: () {
-              setState(() {
-                foodResponse = null;
-              });
-            }, foodRes: FoodsModel(name: '', ingredients: '', description: '', calories: 0, category: '', id: ''),
-          )
-        : const SizedBox.shrink();
-  }
+Widget foodResponseCard() {
+  return foodResponse != null
+      ? Container(
+          padding: const EdgeInsets.all(15),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.lightBlue[200],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Response:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(foodResponse!.message),
+            ],
+          ),
+        )
+      : const SizedBox.shrink();
+}
+
 
   Widget foodListView() {
     return ListView.builder(
       itemCount: _foodList.length,
       itemBuilder: (context, index) {
         final food = _foodList[index];
-        debugPrint('📝 Makanan ${index + 1}: ${food.name} - ${food.calories} kcal');
+        debugPrint(
+            '📝 Makanan ${index + 1}: ${food.name} - ${food.calories} kcal');
         return ListTile(
           title: Text(food.name),
           subtitle: Text('${food.category} - ${food.calories} kcal'),
@@ -272,24 +291,24 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
- Future<void> refreshFoodList() async {
-  try {
-    debugPrint('📡 Mengambil data makanan dari API...');
-    final foods = await _dataService.getAllMenuItem();
-    
-    if (foods == null || foods.isEmpty) {
-      debugPrint('Tidak ada makanan yang ditemukan dari API');
-    } else {
-      debugPrint('Jumlah makanan yang diterima: ${foods.length}');
-    }
+  Future<void> refreshFoodList() async {
+    try {
+      debugPrint('📡 Mengambil data makanan dari API...');
+      final foods = await _dataService.getAllMenuItem();
 
-    setState(() {
-      _foodList = foods?.toList() ?? [];
-    });
-  } catch (e) {
-    debugPrint('Error saat mengambil data makanan: $e');
+      if (foods == null || foods.isEmpty) {
+        debugPrint('Tidak ada makanan yang ditemukan dari API');
+      } else {
+        debugPrint('Jumlah makanan yang diterima: ${foods.length}');
+      }
+
+      setState(() {
+        _foodList = foods?.toList() ?? [];
+      });
+    } catch (e) {
+      debugPrint('Error saat mengambil data makanan: $e');
+    }
   }
-}
 
   void clearFields() {
     _nameCtl.clear();
@@ -331,11 +350,11 @@ class _MenuPageState extends State<MenuPage> {
   Future<List<FoodsModel>?> getAllMenuItem() async {
     try {
       debugPrint('🔍 Fetching menu...');
-      
+
       final response = await dio.get(
-      '$_baseUrl/menu',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
-    );
+        '$_baseUrl/menu',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
       debugPrint('✅ Response status: ${response.statusCode}');
       debugPrint('📦 Response data: ${response.data}');
 
@@ -349,25 +368,24 @@ class _MenuPageState extends State<MenuPage> {
     return null;
   }
 
-
- // ignore: unused_element
- String? _validateName(String? value) {
-  if (value == null || value.length < 4) {
-    return 'Masukkan minimal 4 karakter';
+  // ignore: unused_element
+  String? _validateName(String? value) {
+    if (value == null || value.length < 4) {
+      return 'Masukkan minimal 4 karakter';
+    }
+    return null;
   }
-  return null;
-}
 
 // ignore: unused_element
-String? _validatePhoneNumber(String? value) {
-  if (value == null || !RegExp(r'^[0-9]+$').hasMatch(value)) {
-    return 'Nomor HP harus berisi angka';
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || !RegExp(r'^[0-9]+$').hasMatch(value)) {
+      return 'Nomor HP harus berisi angka';
+    }
+    return null;
   }
-  return null;
-}
 
   dynamic displaySnackbar(BuildContext context, String msg) {
     return ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(msg)));
-}
+  }
 }
