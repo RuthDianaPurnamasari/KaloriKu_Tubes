@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:kaloriku/model/food_model.dart';
 
 class FoodCard extends StatelessWidget {
-  final FoodsModel food;
+  final FoodsModel foodRes;
   final Function() onDismissed;
 
-  const FoodCard({Key? key, required this.food, required this.onDismissed, required FoodResponse response}) : super(key: key);
+  const FoodCard({Key? key, required this.foodRes, required this.onDismissed, required FoodResponse response}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key(food.id),
+      key: Key(foodRes.id),
       onDismissed: (direction){
         onDismissed();
       },
@@ -31,11 +31,11 @@ class FoodCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // if (food.insertedId != null) _buildDataRow('ID', food.insertedId),
-              _buildDataRow('Nama', food.name),
-              _buildDataRow('Bahan', food.ingredients),
-              _buildDataRow('Deskripsi', food.description),
-              _buildDataRow('Kalori', '${food.calories} kcal'),
-              _buildDataRow('Kategori', food.category),
+              _buildDataRow('Nama', foodRes.name),
+              _buildDataRow('Bahan', foodRes.ingredients),
+              _buildDataRow('Deskripsi', foodRes.description),
+              _buildDataRow('Kalori', '${foodRes.calories} kcal'),
+              _buildDataRow('Kategori', foodRes.category),
           ],
         ),
       ),

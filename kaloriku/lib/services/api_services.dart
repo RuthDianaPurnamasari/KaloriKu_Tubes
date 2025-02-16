@@ -10,49 +10,43 @@ class ApiServices {
   Future<Iterable<FoodsModel>?> getAllMenuItem() async {
     try {
       var response = await dio.get('$_baseUrl/menu');
-
-      debugPrint('📥 Response status: ${response.statusCode}');
-      debugPrint('📥 Response data: ${response.data}');
-      debugPrint('📥 Data dari API: ${response.data}');
-
-
       if (response.statusCode == 200) {
         final foodList = (response.data['data'] as List)
-            .map((menu) => FoodsModel.fromJson(menu))
+            .map((food) => FoodsModel.fromJson(food))
             .toList();
-
-        debugPrint('✅ Berhasil parsing data: ${foodList.length} item');
         return foodList;
       }
       return null;
     } on DioException catch (e) {
-      if (e.response != null) {
-        debugPrint('🚨 Dio error: ${e.response!.statusCode} - ${e.response!.data}');
-      } else {
-        debugPrint('🚨 Request error: ${e.message}');
+      if (e.response != null && e.response!.statusCode != 200) {
+        debugPrint('Client error - the request cannot be fulfilled');
+        return null;
       }
-      return null;
-    } catch (e) {
-      debugPrint('🚨 Unexpected error: $e');
-      return null;
-    }
-  }
-
-
-  Future<FoodResponse?> postFood(FoodInput ct) async {
-    try {
-      final response = await dio.post(
-        '$_baseUrl/insertMenu',
-        data: ct.toJson(),
-      );
-      if (response.statusCode == 200) {
-        return FoodResponse.fromJson(response.data);
-      }
-      return null;
+      rethrow;
     } catch (e) {
       rethrow;
     }
   }
+
+  final String token = 'your_token_here'; // Define your token here
+
+ Future<FoodResponse?> postMenu(FoodInput food) async {
+  try {
+    final response = await dio.post(
+      '$_baseUrl/insertMenu',
+      data: food.toJson(),
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+
+    if (response.statusCode == 200) {
+      return FoodResponse.fromJson(response.data);
+    }
+  } catch (e) {
+    debugPrint('❌ Error posting menu: $e');
+  }
+  return null;
+}
+
 
   Future<FoodsModel?> getSingleFood(String id) async {
     try {
@@ -74,32 +68,39 @@ class ApiServices {
     }
   }
 
-  Future<FoodResponse?> putMenu(String id, FoodInput ct) async {
-    try {
-      final response = await Dio().put(
-        '$_baseUrl/updateMenu/$id',
-        data: ct.toJson(),
-      );
-      if (response.statusCode == 200) {
-        return FoodResponse.fromJson(response.data);
-      }
-      return null;
-    } catch (e) {
-      rethrow;
-    }
-  }
+  Future<FoodResponse?> putMenu(String id, FoodInput food) async {
+  try {
+    final response = await dio.put(
+      '$_baseUrl/updateMenu/$id',
+      data: food.toJson(),
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
 
-  Future deleteFood(String id) async {
-    try {
-      final response = await Dio().delete('$_baseUrl/deleteMenu/$id');
-      if (response.statusCode == 200) {
-        return FoodResponse.fromJson(response.data);
-      }
-      return null;
-    } catch (e) {
-      rethrow;
+    if (response.statusCode == 200) {
+      return FoodResponse.fromJson(response.data);
     }
+  } catch (e) {
+    debugPrint('❌ Error updating menu: $e');
   }
+  return null;
+}
+
+
+  Future<void> deleteFood(String id) async {
+  try {
+    final response = await dio.delete(
+      '$_baseUrl/deleteMenu/$id',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+
+    if (response.statusCode == 200) {
+      debugPrint('✅ Menu berhasil dihapus');
+    }
+  } catch (e) {
+    debugPrint('❌ Error deleting menu: $e');
+  }
+}
+
 
  Future<LoginResponse?> login(LoginInput login) async {
   try {

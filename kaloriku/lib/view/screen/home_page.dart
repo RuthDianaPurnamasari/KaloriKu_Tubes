@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaloriku/services/auth_manager.dart';
-import 'package:kaloriku/view/screen/desc_page.dart';
 import 'package:kaloriku/view/screen/menu_page.dart';
-import 'package:kaloriku/view/screen/profile_page.dart';
-import 'package:kaloriku/view/screen/bottom_navbar.dart';
 import 'login_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -23,101 +20,99 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Hero Section
-            Stack(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: Column(
               children: [
-                Container(
-                  width: double.infinity,
-                  height: 250,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/healthy_food.jpeg"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Container(
-                  width: double.infinity,
-                  height: 250,
-                  color: Colors.black.withOpacity(0.4),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    "Hidup Sehat dengan KaloriKu",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Tentang KaloriKu
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Apa Itu KaloriKu?",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                Stack(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: constraints.maxWidth > 600 ? 350 : 250,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage("assets/images/healthy_food.jpeg"),
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "KaloriKu adalah aplikasi catering sehat yang dirancang untuk membantu pengguna dalam memilih makanan sehat, menghitung kalori, dan mendapatkan rekomendasi menu sesuai dengan kebutuhan gizi mereka. Dengan fitur unggulan, KaloriKu menawarkan solusi praktis untuk hidup lebih sehat dan teratur.",
-                        style: TextStyle(fontSize: 16),
-                        textAlign: TextAlign.justify,
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: constraints.maxWidth > 600 ? 350 : 250,
+                      color: Colors.black.withOpacity(0.4),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        "Hidup Sehat dengan KaloriKu",
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Apa Itu KaloriKu?",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            "KaloriKu adalah aplikasi catering sehat yang dirancang untuk membantu pengguna dalam memilih makanan sehat, menghitung kalori, dan mendapatkan rekomendasi menu sesuai dengan kebutuhan gizi mereka. Dengan fitur unggulan, KaloriKu menawarkan solusi praktis untuk hidup lebih sehat dan teratur.",
+                            style: TextStyle(fontSize: 16),
+                            textAlign: TextAlign.justify,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      _buildFeatureCard(
+                        icon: Icons.fastfood,
+                        title: "Menu Sehat",
+                        description:
+                            "Beragam pilihan makanan sehat yang disesuaikan dengan kebutuhan nutrisi Anda.",
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const MenuPage()),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-
-            // Fitur Utama
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  _buildFeatureCard(
-                    icon: Icons.fastfood,
-                    title: "Menu Sehat",
-                    description:
-                        "Beragam pilihan makanan sehat yang disesuaikan dengan kebutuhan nutrisi Anda.",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const MenuPage()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  // Widget untuk Card Fitur
   Widget _buildFeatureCard(
       {required IconData icon,
       required String title,
@@ -161,7 +156,7 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-// LOGOUT
+
 void _showLogoutConfirmationDialog(BuildContext context) {
   showDialog(
     context: context,

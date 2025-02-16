@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kaloriku/model/login_model.dart';
 import 'package:kaloriku/services/api_services.dart';
 import 'package:kaloriku/services/auth_manager.dart';
-import 'package:kaloriku/view/screen/home_page.dart';
+import 'package:kaloriku/view/screen/bottom_navbar.dart'; // ✅ Import Bottom Navbar
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,7 +17,6 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   final ApiServices _dataService = ApiServices();
-
   bool _isLoading = false;
 
   @override
@@ -29,14 +28,15 @@ class _LoginPageState extends State<LoginPage> {
   void checkLogin() async {
     bool isLoggedIn = await AuthManager.isLoggedIn();
     if (isLoggedIn) {
-      Navigator.pushAndRemoveUntil(
-        // ignore: use_build_context_synchronously
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-        (route) => false,
-      );
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DynamicBottomNavbar(), // ✅ Ubah ke DynamicBottomNavbar
+          ),
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -48,22 +48,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   String? _validateUsername(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Username tidak boleh kosong';
-    }
-    if (value.length < 4) {
-      return 'Masukkan minimal 4 karakter';
-    }
+    if (value == null || value.isEmpty) return 'Username tidak boleh kosong';
+    if (value.length < 4) return 'Masukkan minimal 4 karakter';
     return null;
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password tidak boleh kosong';
-    }
-    if (value.length < 3) {
-      return 'Masukkan minimal 3 karakter';
-    }
+    if (value == null || value.isEmpty) return 'Password tidak boleh kosong';
+    if (value.length < 3) return 'Masukkan minimal 3 karakter';
     return null;
   }
 
@@ -89,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
         if (mounted) {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
+            MaterialPageRoute(builder: (context) => const DynamicBottomNavbar()), // ✅ Arahkan ke halaman utama
             (route) => false,
           );
         }
@@ -99,9 +91,11 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       displaySnackbar('Terjadi kesalahan: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -115,61 +109,68 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           title: const Text('Login Page'),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      validator: _validateUsername,
-                      controller: _usernameController,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.account_circle_rounded),
-                        hintText: 'Masukkan username...',
-                        labelText: 'Username',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          validator: _validateUsername,
+                          controller: _usernameController,
+                          decoration: const InputDecoration(
+                            prefixIcon: Icon(Icons.account_circle_rounded),
+                            hintText: 'Masukkan username...',
+                            labelText: 'Username',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+                            fillColor: Color.fromARGB(255, 242, 254, 255),
+                            filled: true,
+                          ),
                         ),
-                        fillColor: Color.fromARGB(255, 242, 254, 255),
-                        filled: true,
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      obscureText: true,
-                      validator: _validatePassword,
-                      controller: _passwordController,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.password_rounded),
-                        hintText: 'Masukkan password...',
-                        labelText: 'Password',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          obscureText: true,
+                          validator: _validatePassword,
+                          controller: _passwordController,
+                          decoration: const InputDecoration(
+                            prefixIcon: Icon(Icons.password_rounded),
+                            hintText: 'Masukkan password...',
+                            labelText: 'Password',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+                            fillColor: Color.fromARGB(255, 242, 254, 255),
+                            filled: true,
+                          ),
                         ),
-                        fillColor: Color.fromARGB(255, 242, 254, 255),
-                        filled: true,
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: constraints.maxWidth * 0.8,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _handleLogin,
+                            child: _isLoading
+                                ? const CircularProgressIndicator(color: Colors.white)
+                                : const Text('Login'),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _handleLogin,
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Login'),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

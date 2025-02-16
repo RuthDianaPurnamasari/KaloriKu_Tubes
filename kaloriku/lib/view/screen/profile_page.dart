@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaloriku/services/auth_manager.dart';
 import 'package:kaloriku/view/screen/login_page.dart';
-import 'package:kaloriku/view/screen/menu_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -10,17 +9,8 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
+        title: const Text("Profile"),
         backgroundColor: Colors.blueAccent,
-        actions: [
-          IconButton(
-            onPressed: () {
-              _showLogoutConfirmationDialog(context);
-            },
-            icon: const Icon(Icons.logout, color: Colors.white),
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -45,7 +35,6 @@ class ProfilePage extends StatelessWidget {
                 ),
               ],
             ),
-            
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: const [
@@ -62,12 +51,19 @@ class ProfilePage extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 20),
+          _buildProfileOption(
+            Icons.logout,
+            "Logout",
+            () => _showLogoutConfirmationDialog(context),
+          ),
         ],
       ),
     );
   }
 
-  void _showLogoutConfirmationDialog(BuildContext context) {
+  // 🔹 Fungsi untuk menampilkan dialog logout
+  static void _showLogoutConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -95,6 +91,23 @@ class ProfilePage extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  // 🔹 Widget untuk membuat opsi profile seperti "Logout"
+  static Widget _buildProfileOption(IconData icon, String title, VoidCallback onTap) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.blueAccent),
+        title: Text(title, style: const TextStyle(fontSize: 16)),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
+      ),
     );
   }
 }
@@ -145,20 +158,4 @@ class _ProfileCard extends StatelessWidget {
       ],
     );
   }
-}
-
-Widget _buildProfileOption(IconData icon, String title, VoidCallback onTap) {
-  return Card(
-    elevation: 2,
-    margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(15),
-    ),
-    child: ListTile(
-      leading: Icon(icon, color: Colors.blueAccent),
-      title: Text(title, style: const TextStyle(fontSize: 16)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: onTap,
-    ),
-  );
 }

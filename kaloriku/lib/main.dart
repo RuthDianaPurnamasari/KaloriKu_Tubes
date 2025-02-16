@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaloriku/view/screen/bottom_navbar.dart';
 import 'package:kaloriku/services/auth_manager.dart';
-import 'package:kaloriku/view/screen/home_page.dart';
+// import 'package:kaloriku/view/screen/home_page.dart';
 import 'package:kaloriku/view/screen/login_page.dart';
 
 void main() {

@@ -5,6 +5,7 @@ import 'package:kaloriku/services/auth_manager.dart';
 import 'package:kaloriku/view/screen/login_page.dart';
 import 'package:kaloriku/view/widget/food_card.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -27,13 +28,16 @@ class _MenuPageState extends State<MenuPage> {
   String foodId = '';
 
   late SharedPreferences loginData;
-  String username = '';
   String token = '';
+  String username = '';
+  final Dio dio = Dio();
+  final String _baseUrl = 'https://ws-kaloriku-4cf736febaf0.herokuapp.com'; // Replace with your actual base URL
 
   @override
     void initState() {
       super.initState();
       inital();
+      refreshFoodList();
     }
     void inital() async {
       loginData = await SharedPreferences.getInstance();
@@ -173,12 +177,12 @@ class _MenuPageState extends State<MenuPage> {
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
               final foodInput = FoodInput(
-                name: _nameCtl.text,
-                ingredients: _ingredientsCtl.text,
-                description: _descriptionCtl.text,
-                calories: _caloriesCtl.text.isNotEmpty ? double.tryParse(_caloriesCtl.text) ?? 0 : 0,
-                category: _categoryCtl.text,
-              );
+              name: _nameCtl.text,
+              ingredients: _ingredientsCtl.text,
+              description: _descriptionCtl.text,
+              calories: double.tryParse(_caloriesCtl.text.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0, // ✅ Pastikan hanya angka
+              category: _categoryCtl.text,
+            );
 
               debugPrint('🔍 Mengirim data: ${foodInput.calories} gram');
 
@@ -187,7 +191,7 @@ class _MenuPageState extends State<MenuPage> {
               if (isEdit) {
                 res = await _dataService.putMenu(foodId, foodInput);
               } else {
-                res = await _dataService.postFood(foodInput);
+                res = await _dataService.postMenu(foodInput);
               }
 
               setState(() {
@@ -223,7 +227,7 @@ class _MenuPageState extends State<MenuPage> {
               setState(() {
                 foodResponse = null;
               });
-            }, food: FoodsModel(name: '', ingredients: '', description: '', calories: 0, category: '', id: ''),
+            }, foodRes: FoodsModel(name: '', ingredients: '', description: '', calories: 0, category: '', id: ''),
           )
         : const SizedBox.shrink();
   }
@@ -233,9 +237,10 @@ class _MenuPageState extends State<MenuPage> {
       itemCount: _foodList.length,
       itemBuilder: (context, index) {
         final food = _foodList[index];
+        debugPrint('📝 Makanan ${index + 1}: ${food.name} - ${food.calories} kcal');
         return ListTile(
           title: Text(food.name),
-          subtitle: Text(food.category),
+          subtitle: Text('${food.category} - ${food.formattedCalories}'),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -267,12 +272,24 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  Future<void> refreshFoodList() async {
+ Future<void> refreshFoodList() async {
+  try {
+    debugPrint('📡 Mengambil data makanan dari API...');
     final foods = await _dataService.getAllMenuItem();
+    
+    if (foods == null || foods.isEmpty) {
+      debugPrint('Tidak ada makanan yang ditemukan dari API');
+    } else {
+      debugPrint('Jumlah makanan yang diterima: ${foods.length}');
+    }
+
     setState(() {
       _foodList = foods?.toList() ?? [];
     });
+  } catch (e) {
+    debugPrint('Error saat mengambil data makanan: $e');
   }
+}
 
   void clearFields() {
     _nameCtl.clear();
@@ -311,20 +328,27 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
+  Future<List<FoodsModel>?> getAllMenuItem() async {
+    try {
+      debugPrint('🔍 Fetching menu...');
+      
+      final response = await dio.get(
+      '$_baseUrl/menu',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+      debugPrint('✅ Response status: ${response.statusCode}');
+      debugPrint('📦 Response data: ${response.data}');
 
-  // Future<void> refreshContactList() async {
-  //   final users = await _dataService.getAllContact();
-  //   setState(() {
-  //     // Bersihkan daftar kontak jika tidak kosong
-  //     if (_nameCtl.isNotEmpty) _contactMdl.clear();
-
-  //     // Tambahkan data baru jika tersedia
-  //     if (users != null) {
-  //       // Konversi Iterable ke List, kemudian gunakan reversed
-  //       _contactMdl.addAll(users.toList().reversed);
-  //     }
-  //   });
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data['data'];
+        return data.map((json) => FoodsModel.fromJson(json)).toList();
+      }
+    } catch (e) {
+      debugPrint('❌ Error fetching menu: $e');
+    }
+    return null;
   }
+
 
  // ignore: unused_element
  String? _validateName(String? value) {
@@ -345,4 +369,5 @@ String? _validatePhoneNumber(String? value) {
   dynamic displaySnackbar(BuildContext context, String msg) {
     return ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(msg)));
+}
 }
