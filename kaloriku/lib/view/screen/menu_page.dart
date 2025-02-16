@@ -31,8 +31,7 @@ class _MenuPageState extends State<MenuPage> {
   String token = '';
   String username = '';
   final Dio dio = Dio();
-  final String _baseUrl =
-      'https://ws-kaloriku-4cf736febaf0.herokuapp.com'; // Replace with your actual base URL
+  final String _baseUrl = 'https://ws-kaloriku-4cf736febaf0.herokuapp.com'; // Replace with your actual base URL
 
   @override
   void initState() {
