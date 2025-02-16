@@ -240,7 +240,7 @@ class _MenuPageState extends State<MenuPage> {
         debugPrint('📝 Makanan ${index + 1}: ${food.name} - ${food.calories} kcal');
         return ListTile(
           title: Text(food.name),
-          subtitle: Text('${food.category} - ${food.formattedCalories}'),
+          subtitle: Text('${food.category} - ${food.calories} kcal'),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

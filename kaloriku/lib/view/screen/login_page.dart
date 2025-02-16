@@ -32,7 +32,8 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) => const DynamicBottomNavbar(), // ✅ Ubah ke DynamicBottomNavbar
+            builder: (context) =>
+                const DynamicBottomNavbar(), // ✅ Ubah ke DynamicBottomNavbar
           ),
           (route) => false,
         );
@@ -81,7 +82,9 @@ class _LoginPageState extends State<LoginPage> {
         if (mounted) {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const DynamicBottomNavbar()), // ✅ Arahkan ke halaman utama
+            MaterialPageRoute(
+                builder: (context) =>
+                    const DynamicBottomNavbar()), // ✅ Arahkan ke halaman utama
             (route) => false,
           );
         }
@@ -128,7 +131,8 @@ class _LoginPageState extends State<LoginPage> {
                             hintText: 'Masukkan username...',
                             labelText: 'Username',
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                             ),
                             fillColor: Color.fromARGB(255, 242, 254, 255),
                             filled: true,
@@ -146,7 +150,8 @@ class _LoginPageState extends State<LoginPage> {
                             hintText: 'Masukkan password...',
                             labelText: 'Password',
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                             ),
                             fillColor: Color.fromARGB(255, 242, 254, 255),
                             filled: true,
@@ -160,7 +165,8 @@ class _LoginPageState extends State<LoginPage> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _handleLogin,
                             child: _isLoading
-                                ? const CircularProgressIndicator(color: Colors.white)
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white)
                                 : const Text('Login'),
                           ),
                         ),

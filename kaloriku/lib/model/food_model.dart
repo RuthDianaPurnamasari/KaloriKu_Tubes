@@ -1,4 +1,3 @@
-//DIGUNAKAN UNTUK GET ALL DATA
 import 'package:flutter/material.dart';
 
 class FoodsModel {
@@ -6,7 +5,7 @@ class FoodsModel {
   final String name;
   final String ingredients;
   final String description;
-  final double calories; // Ubah dari double ke String
+  final int calories; // Menggunakan double agar fleksibel
   final String category;
 
   FoodsModel({
@@ -18,44 +17,40 @@ class FoodsModel {
     required this.category,
   });
 
- factory FoodsModel.fromJson(Map<String, dynamic> json) {
-  debugPrint('📡 Parsing JSON: $json'); //  Tambahkan ini untuk debug
-  return FoodsModel(
-    id: json['_id'] is Map ? json['_id']['\$oid'] ?? '' : json['_id'] ?? '',
-    name: json['name'] ?? '',
-    ingredients: json['ingredients'] ?? '',
-    description: json['description'] ?? '',
-    calories: _parseCalories(json['calories']), // Gunakan fungsi helper
-    category: json['category'] ?? '',
-  );
-}
-
-// Fungsi helper untuk konversi calories
-static double _parseCalories(dynamic value) {
-  if (value is int) {
-    return value.toDouble(); // 🔥 Ubah int ke double
-  } else if (value is String) {
-    return double.tryParse(value) ?? 0.0; // 🔥 Ubah String ke double
-  } else if (value is double) {
-    return value;
+   // Ubah dari JSON
+  factory FoodsModel.fromJson(Map<String, dynamic> json) {
+    return FoodsModel(
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      ingredients: json['ingredients'] ?? '',
+      description: json['description'] ?? '',
+      calories: _parseCalories(json['calories']), // ✅ Gunakan helper
+      category: json['category'] ?? '',
+    );
   }
-  return 0.0; // Default jika null atau tipe lain
-}
 
+  // Fungsi helper untuk menangani berbagai tipe data calories
+  static int _parseCalories(dynamic value) {
+    if (value is int) return value; // Jika sudah int, langsung return
+    if (value is String) return int.tryParse(value) ?? 0; // Jika String, konversi ke int
+    if (value is double) return value.toInt(); // Jika double, konversi ke int
+    return 0; // Default jika null atau tipe lain
+  }
 
   Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,
         "ingredients": ingredients,
         "description": description,
-        "calories": calories,
+        "calories": calories, // Pastikan tetap dalam int
         "category": category,
       };
-      // Getter untuk format "gram kcal"
+  // Getter untuk format "gram kcal"
   String get formattedCalories => '${calories.toStringAsFixed(1)} kcal';
 }
 
-//DIGUNAKAN UNTUK FORM INPUT
+
+// ✅ Model untuk form input makanan
 class FoodInput {
   final String name;
   final String ingredients;
@@ -80,7 +75,7 @@ class FoodInput {
       };
 }
 
-//DIGUNAKAN UNTUK RESPONSE
+// ✅ Model untuk response dari API
 class FoodResponse {
   final String? insertedId;
   final String message;
@@ -92,8 +87,7 @@ class FoodResponse {
     required this.status,
   });
 
-  factory FoodResponse.fromJson(Map<String, dynamic> json) =>
-      FoodResponse(
+  factory FoodResponse.fromJson(Map<String, dynamic> json) => FoodResponse(
         insertedId: json["inserted_id"],
         message: json["message"],
         status: json["status"],

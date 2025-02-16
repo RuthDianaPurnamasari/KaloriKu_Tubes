@@ -10,16 +10,25 @@ class ApiServices {
   Future<Iterable<FoodsModel>?> getAllMenuItem() async {
     try {
       var response = await dio.get('$_baseUrl/menu');
+
+      debugPrint('Response API: ${response.data}');
+
       if (response.statusCode == 200) {
-        final foodList = (response.data['data'] as List)
-            .map((food) => FoodsModel.fromJson(food))
-            .toList();
-        return foodList;
+        if (response.data is List) {
+          // ✅ Jika response berupa List, lakukan mapping
+          final foodList = (response.data as List)
+              .map((food) => FoodsModel.fromJson(food))
+              .toList();
+          return foodList;
+        } else if (response.data is Map<String, dynamic>) {
+          // ✅ Jika hanya ada satu objek, langsung ubah ke List
+          return [FoodsModel.fromJson(response.data)];
+        }
       }
       return null;
     } on DioException catch (e) {
       if (e.response != null && e.response!.statusCode != 200) {
-        debugPrint('Client error - the request cannot be fulfilled');
+        debugPrint('❌ Client error - the request cannot be fulfilled');
         return null;
       }
       rethrow;
@@ -30,27 +39,28 @@ class ApiServices {
 
   final String token = 'your_token_here'; // Define your token here
 
- Future<FoodResponse?> postMenu(FoodInput food) async {
-  try {
-    final response = await dio.post(
-      '$_baseUrl/insertMenu',
-      data: food.toJson(),
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
-    );
+  Future<FoodResponse?> postMenu(FoodInput food) async {
+    try {
+      final response = await dio.post(
+        '$_baseUrl/insertMenu',
+        data: food.toJson(),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
 
-    if (response.statusCode == 200) {
-      return FoodResponse.fromJson(response.data);
+      if (response.statusCode == 200) {
+        return FoodResponse.fromJson(response.data);
+      }
+    } catch (e) {
+      debugPrint('❌ Error posting menu: $e');
     }
-  } catch (e) {
-    debugPrint('❌ Error posting menu: $e');
+    return null;
   }
-  return null;
-}
-
 
   Future<FoodsModel?> getSingleFood(String id) async {
     try {
       var response = await dio.get('$_baseUrl/menu/$id');
+
+      print("📡 Response dari API: ${response.data}");
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -69,81 +79,79 @@ class ApiServices {
   }
 
   Future<FoodResponse?> putMenu(String id, FoodInput food) async {
-  try {
-    final response = await dio.put(
-      '$_baseUrl/updateMenu/$id',
-      data: food.toJson(),
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
-    );
+    try {
+      final response = await dio.put(
+        '$_baseUrl/updateMenu/$id',
+        data: food.toJson(),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
 
-    if (response.statusCode == 200) {
-      return FoodResponse.fromJson(response.data);
+      if (response.statusCode == 200) {
+        return FoodResponse.fromJson(response.data);
+      }
+    } catch (e) {
+      debugPrint('❌ Error updating menu: $e');
     }
-  } catch (e) {
-    debugPrint('❌ Error updating menu: $e');
+    return null;
   }
-  return null;
-}
-
 
   Future<void> deleteFood(String id) async {
-  try {
-    final response = await dio.delete(
-      '$_baseUrl/deleteMenu/$id',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
-    );
+    try {
+      final response = await dio.delete(
+        '$_baseUrl/deleteMenu/$id',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
 
-    if (response.statusCode == 200) {
-      debugPrint('✅ Menu berhasil dihapus');
-    }
-  } catch (e) {
-    debugPrint('❌ Error deleting menu: $e');
-  }
-}
-
-
- Future<LoginResponse?> login(LoginInput login) async {
-  try {
-    final String url = '$_baseUrl/login';
-    
-    debugPrint('🔍 Request ke: $url');
-
-    final response = await dio.post(
-      url,
-      data: login.toJson(),
-      options: Options(
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ),
-    );
-
-    debugPrint('✅ Response: ${response.data}');
-
-    if (response.statusCode == 200) {
-      return LoginResponse.fromJson(response.data);
-    }
-    return null;
-  } on DioException catch (e) {
-    if (e.response != null) {
-      debugPrint('🚨 Login error: ${e.response!.statusCode} - ${e.response!.data}');
-
-      if (e.response!.statusCode == 404) {
-        debugPrint('⚠️ Endpoint /login tidak ditemukan! Cek API backend.');
-      } else if (e.response!.statusCode == 401) {
-        debugPrint('⚠️ Unauthorized! Pastikan username & password benar.');
+      if (response.statusCode == 200) {
+        debugPrint('✅ Menu berhasil dihapus');
       }
+    } catch (e) {
+      debugPrint('❌ Error deleting menu: $e');
+    }
+  }
 
+  Future<LoginResponse?> login(LoginInput login) async {
+    try {
+      final String url = '$_baseUrl/login';
+
+      debugPrint('🔍 Request ke: $url');
+
+      final response = await dio.post(
+        url,
+        data: login.toJson(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      debugPrint('✅ Response: ${response.data}');
+
+      if (response.statusCode == 200) {
+        return LoginResponse.fromJson(response.data);
+      }
       return null;
-    } else {
-      debugPrint('🚨 Request error: ${e.message}');
+    } on DioException catch (e) {
+      if (e.response != null) {
+        debugPrint(
+            '🚨 Login error: ${e.response!.statusCode} - ${e.response!.data}');
+
+        if (e.response!.statusCode == 404) {
+          debugPrint('⚠️ Endpoint /login tidak ditemukan! Cek API backend.');
+        } else if (e.response!.statusCode == 401) {
+          debugPrint('⚠️ Unauthorized! Pastikan username & password benar.');
+        }
+
+        return null;
+      } else {
+        debugPrint('🚨 Request error: ${e.message}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('🚨 Unexpected error: $e');
       return null;
     }
-  } catch (e) {
-    debugPrint('🚨 Unexpected error: $e');
-    return null;
   }
-}
-
 }
