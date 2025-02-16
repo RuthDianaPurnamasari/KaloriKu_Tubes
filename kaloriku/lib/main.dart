@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaloriku/view/screen/bottom_navbar.dart';
 import 'package:kaloriku/services/auth_manager.dart';
-// import 'package:kaloriku/view/screen/home_page.dart';
+import 'package:kaloriku/view/screen/home_page.dart'; // ✅ Tambahkan HomePage
 import 'package:kaloriku/view/screen/login_page.dart';
 
 void main() {
@@ -16,37 +16,31 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  bool isAuthenticated = false;
-  bool isLoading = true;
-
   @override
   void initState() {
     super.initState();
     checkAuthStatus();
   }
 
+  /// Fungsi untuk mengecek status login setelah HomePage ditampilkan
   Future<void> checkAuthStatus() async {
-    bool authStatus = await AuthManager.isLoggedIn();
-    setState(() {
-      isAuthenticated = authStatus;
-      isLoading = false;
-    });
-  }
-
- @override
-  Widget build(BuildContext context) {
-    if (isLoading) {
-      return const MaterialApp(
-        home: Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
+    await Future.delayed(const Duration(seconds: 2)); // ✅ Tunggu sebentar
+    bool isAuthenticated = await AuthManager.isLoggedIn();
+    
+    if (!isAuthenticated && mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     }
-    return MaterialApp(
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'KaloriKu',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: isAuthenticated ? const DynamicBottomNavbar() : const LoginPage(),
+      home: HomePage(), // ✅ Awali dengan HomePage dulu
     );
   }
 }

@@ -10,13 +10,15 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('KaloriKu'),
+        title: const Text('KaloriKu',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.deepPurple,
         actions: [
           IconButton(
             onPressed: () {
               _showLogoutConfirmationDialog(context);
             },
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
           ),
         ],
       ),
@@ -30,11 +32,20 @@ class HomePage extends StatelessWidget {
                     Container(
                       width: double.infinity,
                       height: constraints.maxWidth > 600 ? 350 : 250,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
                           image: AssetImage("assets/images/healthy_food.jpeg"),
                           fit: BoxFit.cover,
                         ),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 8,
+                            spreadRadius: 2,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
                     ),
                     Container(
@@ -48,6 +59,13 @@ class HomePage extends StatelessWidget {
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 4.0,
+                              color: Colors.black26,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -61,7 +79,9 @@ class HomePage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 5,
+                    elevation: 6,
+                    color: Colors.white,
+                    shadowColor: Colors.deepPurple,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -78,7 +98,8 @@ class HomePage extends StatelessWidget {
                           const SizedBox(height: 10),
                           const Text(
                             "KaloriKu adalah aplikasi catering sehat yang dirancang untuk membantu pengguna dalam memilih makanan sehat, menghitung kalori, dan mendapatkan rekomendasi menu sesuai dengan kebutuhan gizi mereka. Dengan fitur unggulan, KaloriKu menawarkan solusi praktis untuk hidup lebih sehat dan teratur.",
-                            style: TextStyle(fontSize: 16),
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.black87),
                             textAlign: TextAlign.justify,
                           ),
                         ],
@@ -98,7 +119,8 @@ class HomePage extends StatelessWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const MenuPage()),
+                            MaterialPageRoute(
+                                builder: (context) => const MenuPage()),
                           );
                         },
                       ),
@@ -122,8 +144,10 @@ class HomePage extends StatelessWidget {
       onTap: onTap,
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 3,
+        elevation: 4,
+        shadowColor: Colors.deepPurple,
         margin: const EdgeInsets.only(bottom: 12),
+        color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
@@ -144,7 +168,8 @@ class HomePage extends StatelessWidget {
                     const SizedBox(height: 5),
                     Text(
                       description,
-                      style: const TextStyle(fontSize: 14, color: Colors.black54),
+                      style:
+                          const TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                   ],
                 ),
