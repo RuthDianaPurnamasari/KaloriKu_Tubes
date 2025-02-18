@@ -38,7 +38,7 @@ class _DynamicBottomNavbarState extends State<DynamicBottomNavbar> {
                 NavigationRail(
                   selectedIndex: _currentPageIndex,
                   onDestinationSelected: onTabTapped,
-                  backgroundColor: const Color.fromARGB(255, 123, 173, 230),
+                  backgroundColor: const Color.fromARGB(255, 16, 81, 50),
                   selectedIconTheme: const IconThemeData(color: Colors.black),
                   unselectedIconTheme: const IconThemeData(color: Colors.white),
                   destinations: const [
@@ -81,7 +81,7 @@ class _DynamicBottomNavbarState extends State<DynamicBottomNavbar> {
                   label: 'Food',
                 ),
               ],
-              backgroundColor: const Color.fromARGB(255, 123, 173, 230),
+              backgroundColor: const Color.fromARGB(255, 16, 81, 50),
               selectedItemColor: Colors.black,
               unselectedItemColor: Colors.white,
             ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kaloriku/model/login_model.dart';
 import 'package:kaloriku/services/api_services.dart';
 import 'package:kaloriku/services/auth_manager.dart';
-import 'package:kaloriku/view/screen/bottom_navbar.dart'; // ✅ Import Bottom Navbar
+import 'package:kaloriku/view/screen/bottom_navbar.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -32,8 +32,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                const DynamicBottomNavbar(), // ✅ Ubah ke DynamicBottomNavbar
+            builder: (context) => const DynamicBottomNavbar(),
           ),
           (route) => false,
         );
@@ -60,7 +59,6 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
-  /// Fungsi untuk menangani proses login.
   Future<void> _handleLogin() async {
     final isValidForm = _formKey.currentState!.validate();
     if (!isValidForm) return;
@@ -83,8 +81,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    const DynamicBottomNavbar()), // ✅ Arahkan ke halaman utama
+                builder: (context) => const DynamicBottomNavbar()),
             (route) => false,
           );
         }
@@ -109,80 +106,111 @@ class _LoginPageState extends State<LoginPage> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Login Page'),
-        ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          validator: _validateUsername,
-                          controller: _usernameController,
-                          decoration: const InputDecoration(
-                            prefixIcon: Icon(Icons.account_circle_rounded),
-                            hintText: 'Masukkan username...',
-                            labelText: 'Username',
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                            fillColor: Color.fromARGB(255, 242, 254, 255),
-                            filled: true,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          obscureText: true,
-                          validator: _validatePassword,
-                          controller: _passwordController,
-                          decoration: const InputDecoration(
-                            prefixIcon: Icon(Icons.password_rounded),
-                            hintText: 'Masukkan password...',
-                            labelText: 'Password',
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                            fillColor: Color.fromARGB(255, 242, 254, 255),
-                            filled: true,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          width: constraints.maxWidth * 0.8,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _handleLogin,
-                            child: _isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white)
-                                : const Text('Login'),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+        body: Stack(
+          children: [
+            // Background Image
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/background.jpg'),
+                  fit: BoxFit.cover,
                 ),
               ),
-            );
-          },
+            ),
+            // Gradient Overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.black.withOpacity(0.6),
+                    Colors.black.withOpacity(0.3),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+            // Login Form
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Logo
+                    Image.asset(
+                      'assets/images/logo.png',
+                      height: 100,
+                    ),
+                    const SizedBox(height: 20),
+                    // Login Form
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              validator: _validateUsername,
+                              controller: _usernameController,
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.account_circle_rounded),
+                                hintText: 'Masukkan username...',
+                                labelText: 'Username',
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                fillColor: Color.fromARGB(255, 242, 254, 255),
+                                filled: true,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              obscureText: true,
+                              validator: _validatePassword,
+                              controller: _passwordController,
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.password_rounded),
+                                hintText: 'Masukkan password...',
+                                labelText: 'Password',
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                fillColor: Color.fromARGB(255, 242, 254, 255),
+                                filled: true,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null : _handleLogin,
+                                child: _isLoading
+                                    ? const CircularProgressIndicator(
+                                        color: Colors.white)
+                                    : const Text('Login'),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// Menampilkan snackbar dengan pesan tertentu.
   void displaySnackbar(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }

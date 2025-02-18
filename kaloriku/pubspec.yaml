@@ -22,6 +22,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/KaloriKu.png
+    - assets/images/background.jpg
+    - assets/images/logo.png
     - assets/images/Ruth.jpg
     - assets/images/Nida.jpg
     # - assets/icons/

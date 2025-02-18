@@ -13,47 +13,23 @@ class DescPage extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('About'),
-            backgroundColor: Color.fromARGB(255, 123, 173, 230),
+            title: const Text('About', style: TextStyle(color: Colors.white)),
+            backgroundColor: Color.fromARGB(255, 16, 81, 50),
             actions: [
               IconButton(
                 onPressed: () {
                   _showLogoutConfirmationDialog(context);
                 },
-                icon: const Icon(Icons.logout),
+                icon: const Icon(Icons.logout, color: Colors.white),
               ),
             ],
           ),
           body: SingleChildScrollView(
             child: Column(
               children: [
-                Stack(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 200,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage("assets/images/KaloriKu.png"),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 200,
-                      color: Colors.black.withOpacity(0.3),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        "Aplikasi KaloriKu",
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
+                Image(
+                  image: AssetImage('assets/images/logo.png'),
+                  height: 120,
                 ),
                 const SizedBox(height: 20),
                 Padding(
@@ -73,7 +49,7 @@ class DescPage extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple,
+                              color: Color.fromARGB(255, 16, 81, 50),
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -138,7 +114,7 @@ class DescPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
-            Icon(icon, size: 40, color: Colors.deepPurple),
+            Icon(icon, size: 40, color: Color.fromARGB(255, 16, 81, 50)),
             const SizedBox(width: 15),
             Expanded(
               child: Column(

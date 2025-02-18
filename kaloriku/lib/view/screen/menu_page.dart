@@ -20,12 +20,13 @@ class _MenuPageState extends State<MenuPage> {
   final _ingredientsCtl = TextEditingController();
   final _descriptionCtl = TextEditingController();
   final _caloriesCtl = TextEditingController();
-  final _categoryCtl = TextEditingController();
   final ApiServices _dataService = ApiServices();
   List<FoodsModel> _foodList = [];
   FoodResponse? foodResponse;
   bool isEdit = false;
   String foodId = '';
+  String? _selectedCategory;
+  final List<String> _categories = ['Vegan', 'High Protein', 'Dessert', 'Drink'];
 
   late SharedPreferences loginData;
   String token = '';
@@ -54,7 +55,6 @@ class _MenuPageState extends State<MenuPage> {
     _ingredientsCtl.dispose();
     _descriptionCtl.dispose();
     _caloriesCtl.dispose();
-    _categoryCtl.dispose();
     super.dispose();
   }
 
@@ -62,14 +62,14 @@ class _MenuPageState extends State<MenuPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('KaloriKu - Management Menu'),
-        backgroundColor: Color.fromARGB(255, 123, 173, 230),
+        title: const Text('KaloriKu - Management Menu', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color.fromARGB(255, 16, 81, 50),
         actions: [
           IconButton(
             onPressed: () {
               _showLogoutConfirmationDialog(context);
             },
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
           ),
         ],
       ),
@@ -81,7 +81,7 @@ class _MenuPageState extends State<MenuPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Card(),
+              userCard(),
               const SizedBox(height: 20.0),
               foodForm(),
               actionButtons(),
@@ -110,7 +110,7 @@ class _MenuPageState extends State<MenuPage> {
   Widget userCard() {
     return Card(
       elevation: 4,
-      color: Colors.tealAccent,
+      color: const Color.fromARGB(255, 201, 198, 165),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -125,16 +125,16 @@ class _MenuPageState extends State<MenuPage> {
                 ),
               ],
             ),
-            Row(
-              children: [
-                const Icon(Icons.key),
-                const SizedBox(width: 8.0),
-                Text(
-                  'Token: $token',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     const Icon(Icons.key),
+            //     const SizedBox(width: 8.0),
+            //     Text(
+            //       'Token: $token',
+            //       style: const TextStyle(fontWeight: FontWeight.bold),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),
@@ -151,7 +151,7 @@ class _MenuPageState extends State<MenuPage> {
             validator: _validateDescription),
         textField(_caloriesCtl, 'Kalori',
             isNumber: true, validator: _validateCalories),
-        textField(_categoryCtl, 'Kategori', validator: _validateCategory),
+        dropdownField('Kategori', validator: _validateCategory),
       ],
     );
   }
@@ -176,6 +176,31 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
+  Widget dropdownField(String label, {String? Function(String?)? validator}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: DropdownButtonFormField<String>(
+        value: _selectedCategory,
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          labelText: label,
+        ),
+        items: _categories.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          setState(() {
+            _selectedCategory = newValue;
+          });
+        },
+        validator: validator,
+      ),
+    );
+  }
+
   Widget actionButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -190,7 +215,7 @@ class _MenuPageState extends State<MenuPage> {
                 calories: double.tryParse(
                         _caloriesCtl.text.replaceAll(RegExp(r'[^0-9.]'), '')) ??
                     0, // ✅ Pastikan hanya angka
-                category: _categoryCtl.text,
+                category: _selectedCategory ?? '',
               );
 
               debugPrint('🔍 Mengirim data: ${foodInput.calories} gram');
@@ -234,7 +259,7 @@ class _MenuPageState extends State<MenuPage> {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: Colors.lightBlue[200],
+            color: const Color.fromARGB(255, 41, 184, 105),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,7 +306,14 @@ Widget _buildResponseRow(String label, String value) {
             '📝 Makanan ${index + 1}: ${food.name} - ${food.calories} kcal');
         return ListTile(
           title: Text(food.name),
-          subtitle: Text('${food.category} - ${food.calories} kcal'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Kategori: ${food.category}'),
+              Text('Kalori: ${food.calories} kcal'),
+              Text('Komposisi: ${food.ingredients}'),
+            ],
+          ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -324,7 +356,7 @@ Widget _buildResponseRow(String label, String value) {
                   _ingredientsCtl.text = food.ingredients;
                   _descriptionCtl.text = food.description;
                   _caloriesCtl.text = food.calories.toString();
-                  _categoryCtl.text = food.category;
+                  _selectedCategory = food.category;
                   isEdit = true;
                   foodId = food.id;
                 });
@@ -387,7 +419,7 @@ Widget _buildResponseRow(String label, String value) {
     _ingredientsCtl.clear();
     _descriptionCtl.clear();
     _caloriesCtl.clear();
-    _categoryCtl.clear();
+    _selectedCategory = null;
   }
 
   void _showLogoutConfirmationDialog(BuildContext context) {
