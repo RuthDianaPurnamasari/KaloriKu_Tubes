@@ -60,24 +60,24 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('KaloriKu - Management Menu', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color.fromARGB(255, 16, 81, 50),
-        actions: [
-          IconButton(
-            onPressed: () {
-              _showLogoutConfirmationDialog(context);
-            },
-            icon: const Icon(Icons.logout, color: Colors.white),
-          ),
-        ],
-      ),
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(8.0),
-        child: Form(
-          key: _formKey,
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('KaloriKu - Management Menu', style: TextStyle(color: Colors.white)),
+      backgroundColor: const Color.fromARGB(255, 16, 81, 50),
+      actions: [
+        IconButton(
+          onPressed: () {
+            _showLogoutConfirmationDialog(context);
+          },
+          icon: const Icon(Icons.logout, color: Colors.white),
+        ),
+      ],
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -95,7 +95,10 @@ class _MenuPageState extends State<MenuPage> {
                 ),
               ),
               const SizedBox(height: 8.0),
-              Expanded(
+
+              /// ✅ Gunakan SizedBox agar `ListView.builder()` memiliki tinggi tetap
+              SizedBox(
+                height: 400, // ✅ Tentukan tinggi untuk daftar makanan
                 child: _foodList.isEmpty
                     ? const Center(child: Text('Tidak ada data makanan'))
                     : foodListView(),
@@ -104,8 +107,10 @@ class _MenuPageState extends State<MenuPage> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget userCard() {
     return Card(
@@ -370,30 +375,57 @@ Widget _buildResponseRow(String label, String value) {
   }
 
   void _showDeleteConfirmationDialog(BuildContext context, String foodId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Konfirmasi Hapus'),
-          content: const Text('Anda yakin ingin menghapus data ini?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Tidak'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                _dataService.deleteFood(foodId);
-                refreshFoodList();
-              },
-              child: const Text('Ya'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  showDialog(
+    context: context,
+    builder: (BuildContext dialogContext) {
+      return AlertDialog(
+        title: const Text('Konfirmasi Hapus'),
+        content: const Text('Anda yakin ingin menghapus data ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Tidak'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+
+              FoodResponse? response = await _dataService.deleteFood(foodId);
+
+              if (response != null) {
+                await refreshFoodList();
+                setState(() {}); // Pastikan UI di-refresh
+
+                // Tampilkan response API di dalam card
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Menu Dihapus'),
+                      content: Text(response.message ?? '✅ Menu berhasil dihapus!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('❌ Gagal menghapus menu!'))
+                );
+              }
+            },
+            child: const Text('Ya'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   Future<void> refreshFoodList() async {
     try {

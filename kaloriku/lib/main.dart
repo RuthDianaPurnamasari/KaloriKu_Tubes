@@ -19,7 +19,11 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    checkAuthStatus();
+    
+    // ✅ Pastikan cek login hanya dijalankan setelah widget siap
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkAuthStatus();
+    });
   }
 
   /// Fungsi untuk mengecek status login setelah HomePage ditampilkan
@@ -27,7 +31,7 @@ class _MainAppState extends State<MainApp> {
     await Future.delayed(const Duration(seconds: 2)); // ✅ Tunggu sebentar
     bool isAuthenticated = await AuthManager.isLoggedIn();
     
-    if (!isAuthenticated && mounted) {
+    if (!isAuthenticated && mounted) { // ✅ Pastikan widget masih tersedia
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),

@@ -95,25 +95,32 @@ class ApiServices {
     return null;
   }
 
-  Future<void> deleteFood(String id) async {
-    try {
-      final response = await dio.delete(
-        '$_baseUrl/deleteMenu/$id',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
+  Future<FoodResponse?> deleteFood(String id) async {
+  try {
+    final response = await dio.delete(
+      '$_baseUrl/deleteMenu/$id',
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
 
-      if (response.statusCode == 200) {
-        debugPrint('✅ Menu berhasil dihapus');
+    if (response.statusCode == 200) {
+      debugPrint('✅ Menu berhasil dihapus!');
+
+      // Jika API mengembalikan response, parsing ke model
+      if (response.data is Map<String, dynamic>) {
+        return FoodResponse.fromJson(response.data);
       }
-    } catch (e) {
-      debugPrint('❌ Error deleting menu: $e');
     }
+  } catch (e) {
+    debugPrint('❌ Error deleting menu: $e');
   }
+  return null;
+}
+
 
   Future<LoginResponse?> login(LoginInput login) async {
     try {
       final String url = '$_baseUrl/login';
-
+  
       debugPrint('🔍 Request ke: $url');
 
       final response = await dio.post(
